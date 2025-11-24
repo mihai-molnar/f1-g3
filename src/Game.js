@@ -20,6 +20,7 @@ export class Game {
 
         this.lastTime = 0;
         this.gameOver = false;
+        this.shake = 0;
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'r' || e.key === 'R') {
@@ -41,6 +42,24 @@ export class Game {
             this.raceStarted = true;
             this.lapStartTime = performance.now();
         }
+
+        // Camera shake decay
+        if (this.shake > 0) {
+            this.shake -= 0.2;
+            if (this.shake < 0) this.shake = 0;
+        }
+
+        // Trigger shake on high speed or off-track
+        const corners = this.car.getCorners();
+        let wheelsOff = 0;
+        for (let p of corners) {
+            if (!this.track.isPointOnTrack(p.x, p.y)) {
+                wheelsOff++;
+            }
+        }
+        if (wheelsOff > 0) {
+            this.shake = Math.min(this.shake + 0.8, 5);
+        }
     }
 
     draw() {
@@ -48,8 +67,13 @@ export class Game {
         this.ctx.fillRect(0, 0, this.width, this.height);
 
         this.ctx.save();
+
+        // Apply shake
+        const shakeX = (Math.random() - 0.5) * this.shake;
+        const shakeY = (Math.random() - 0.5) * this.shake;
+
         // Center camera on car
-        this.ctx.translate(this.width / 2 - this.car.x, this.height / 2 - this.car.y);
+        this.ctx.translate(this.width / 2 - this.car.x + shakeX, this.height / 2 - this.car.y + shakeY);
 
         this.track.draw(this.ctx);
         this.car.draw(this.ctx);
@@ -65,19 +89,11 @@ export class Game {
         this.checkTrackLimits();
         this.checkCheckpoints();
         this.draw();
-        this.drawHUD();
+        this.checkCheckpoints();
+        this.draw();
+        this.updateHUD();
 
-        if (this.gameOver) {
-            this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-            this.ctx.fillRect(0, 0, this.width, this.height);
-            this.ctx.fillStyle = "white";
-            this.ctx.font = "48px sans-serif";
-            this.ctx.textAlign = "center";
-            this.ctx.fillText("DNF!", this.width / 2, this.height / 2 - 40);
-            this.ctx.font = "24px sans-serif";
-            this.ctx.fillText("Press R to Retry (Same Track)", this.width / 2, this.height / 2 + 20);
-            this.ctx.fillText("Press N for New Track", this.width / 2, this.height / 2 + 60);
-        }
+
 
         requestAnimationFrame(this.loop);
     }
@@ -111,25 +127,31 @@ export class Game {
         this.lapStartTime = now;
     }
 
-    drawHUD() {
-        this.ctx.fillStyle = "white";
-        this.ctx.font = "20px monospace";
-        this.ctx.textAlign = "left";
-        // Scale speed to reach 375 km/h at max speed
+    updateHUD() {
+        // Speed
         const displaySpeed = (Math.abs(this.car.speed) / this.car.maxSpeed) * 375;
-        this.ctx.fillText(`Speed: ${displaySpeed.toFixed(0)} km/h`, 20, 30);
+        document.getElementById('speed-value').textContent = displaySpeed.toFixed(0);
 
+        // Time
         let currentLapTime = "0.00";
         if (this.raceStarted) {
             currentLapTime = ((performance.now() - this.lapStartTime) / 1000).toFixed(2);
         }
-        this.ctx.fillText(`Time: ${currentLapTime}s`, 20, 60);
+        document.getElementById('current-time').textContent = currentLapTime;
 
         if (this.lastLapTime > 0) {
-            this.ctx.fillText(`Last Lap: ${this.lastLapTime.toFixed(2)}s`, 20, 90);
+            document.getElementById('last-time').textContent = this.lastLapTime.toFixed(2);
         }
         if (this.bestLapTime > 0) {
-            this.ctx.fillText(`Best Lap: ${this.bestLapTime.toFixed(2)}s`, 20, 120);
+            document.getElementById('best-time').textContent = this.bestLapTime.toFixed(2);
+        }
+
+        // Game Over Screen
+        const gameOverEl = document.getElementById('game-over');
+        if (this.gameOver) {
+            gameOverEl.classList.remove('hidden');
+        } else {
+            gameOverEl.classList.add('hidden');
         }
     }
 

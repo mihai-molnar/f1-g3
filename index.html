@@ -1,13 +1,45 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>f1-antigravity</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>f1-antigravity</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <div id="hud">
+    <div id="speed-box">
+      <span class="label">SPEED</span>
+      <span id="speed-value">0</span>
+      <span class="unit">KM/H</span>
+    </div>
+    <div id="time-box">
+      <div class="time-row">
+        <span class="label">CURRENT</span>
+        <span id="current-time">0.00</span>
+      </div>
+      <div class="time-row">
+        <span class="label">LAST</span>
+        <span id="last-time">0.00</span>
+      </div>
+      <div class="time-row">
+        <span class="label">BEST</span>
+        <span id="best-time">0.00</span>
+      </div>
+    </div>
+    <div id="game-over" class="hidden">
+      <h1>DNF</h1>
+      <p>TRACK LIMITS EXCEEDED</p>
+      <div class="controls">
+        <div class="key-hint"><span class="key">R</span> RETRY</div>
+        <div class="key-hint"><span class="key">N</span> NEW TRACK</div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

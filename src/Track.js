@@ -98,7 +98,11 @@ export class Track {
         ctx.lineWidth = this.width;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.strokeStyle = "#333"; // Dark asphalt
+
+        if (!this.asphaltPattern) {
+            this.asphaltPattern = this.createNoisePattern(ctx);
+        }
+        ctx.strokeStyle = this.asphaltPattern;
 
         if (this.points.length > 0) {
             ctx.moveTo(this.points[0].x, this.points[0].y);
@@ -115,7 +119,7 @@ export class Track {
         ctx.stroke();
 
         ctx.lineWidth = this.width - 10;
-        ctx.strokeStyle = "#333"; // Redraw asphalt over white border to create outline
+        ctx.strokeStyle = this.asphaltPattern; // Redraw asphalt over white border to create outline
         ctx.stroke();
 
         // Center Line
@@ -163,6 +167,25 @@ export class Track {
 
             ctx.restore();
         }
+    }
+
+    createNoisePattern(ctx) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        const c = canvas.getContext('2d');
+
+        c.fillStyle = "#333";
+        c.fillRect(0, 0, 100, 100);
+
+        for (let i = 0; i < 500; i++) {
+            c.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.1})`;
+            c.fillRect(Math.random() * 100, Math.random() * 100, 2, 2);
+            c.fillStyle = `rgba(0, 0, 0, ${Math.random() * 0.1})`;
+            c.fillRect(Math.random() * 100, Math.random() * 100, 2, 2);
+        }
+
+        return ctx.createPattern(canvas, 'repeat');
     }
 
     isPointOnTrack(x, y) {

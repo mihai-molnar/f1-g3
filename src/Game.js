@@ -1,0 +1,155 @@
+import { Car } from './Car.js';
+import { Track } from './Track.js';
+
+export class Game {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.width = canvas.width;
+        this.height = canvas.height;
+
+        this.track = new Track();
+        // Start car at the first track point
+        this.car = new Car(this.track.points[0].x, this.track.points[0].y);
+
+        this.currentCheckpoint = 0;
+        this.raceStarted = false;
+        this.lapStartTime = 0;
+        this.lastLapTime = 0;
+        this.bestLapTime = 0;
+
+        this.lastTime = 0;
+        this.gameOver = false;
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                if (this.gameOver) this.restart();
+            }
+        });
+
+        this.loop = this.loop.bind(this);
+        requestAnimationFrame(this.loop);
+    }
+
+    update(deltaTime) {
+        this.car.update();
+
+        if (!this.raceStarted && (this.car.speed !== 0 || this.car.controls.forward)) {
+            this.raceStarted = true;
+            this.lapStartTime = performance.now();
+        }
+    }
+
+    draw() {
+        this.ctx.fillStyle = "green";
+        this.ctx.fillRect(0, 0, this.width, this.height);
+
+        this.ctx.save();
+        // Center camera on car
+        this.ctx.translate(this.width / 2 - this.car.x, this.height / 2 - this.car.y);
+
+        this.track.draw(this.ctx);
+        this.car.draw(this.ctx);
+
+        this.ctx.restore();
+    }
+
+    loop(timestamp) {
+        const deltaTime = timestamp - this.lastTime;
+        this.lastTime = timestamp;
+
+        this.update(deltaTime);
+        this.checkTrackLimits();
+        this.checkCheckpoints();
+        this.draw();
+        this.drawHUD();
+
+        if (this.gameOver) {
+            this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+            this.ctx.fillRect(0, 0, this.width, this.height);
+            this.ctx.fillStyle = "white";
+            this.ctx.font = "48px sans-serif";
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("DNF! Press R to Restart", this.width / 2, this.height / 2);
+        }
+
+        requestAnimationFrame(this.loop);
+    }
+
+    checkCheckpoints() {
+        if (this.gameOver || !this.raceStarted) return;
+
+        // Simple checkpoint logic: must be within a certain distance of the next point
+        const nextPointIndex = (this.currentCheckpoint + 1) % this.track.points.length;
+        const nextPoint = this.track.points[nextPointIndex];
+
+        const dist = Math.hypot(this.car.x - nextPoint.x, this.car.y - nextPoint.y);
+
+        // Checkpoint radius can be large, just need to pass generally near it
+        if (dist < this.track.width * 1.5) {
+            this.currentCheckpoint = nextPointIndex;
+
+            if (this.currentCheckpoint === 0) {
+                this.completeLap();
+            }
+        }
+    }
+
+    completeLap() {
+        const now = performance.now();
+        const lapTime = (now - this.lapStartTime) / 1000;
+        this.lastLapTime = lapTime;
+        if (this.bestLapTime === 0 || lapTime < this.bestLapTime) {
+            this.bestLapTime = lapTime;
+        }
+        this.lapStartTime = now;
+    }
+
+    drawHUD() {
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "20px monospace";
+        this.ctx.textAlign = "left";
+        // Scale speed to reach 375 km/h at max speed
+        const displaySpeed = (Math.abs(this.car.speed) / this.car.maxSpeed) * 375;
+        this.ctx.fillText(`Speed: ${displaySpeed.toFixed(0)} km/h`, 20, 30);
+
+        let currentLapTime = "0.00";
+        if (this.raceStarted) {
+            currentLapTime = ((performance.now() - this.lapStartTime) / 1000).toFixed(2);
+        }
+        this.ctx.fillText(`Time: ${currentLapTime}s`, 20, 60);
+
+        if (this.lastLapTime > 0) {
+            this.ctx.fillText(`Last Lap: ${this.lastLapTime.toFixed(2)}s`, 20, 90);
+        }
+        if (this.bestLapTime > 0) {
+            this.ctx.fillText(`Best Lap: ${this.bestLapTime.toFixed(2)}s`, 20, 120);
+        }
+    }
+
+    checkTrackLimits() {
+        if (this.gameOver) return;
+
+        const corners = this.car.getCorners();
+        let wheelsOff = 0;
+        for (let p of corners) {
+            if (!this.track.isPointOnTrack(p.x, p.y)) {
+                wheelsOff++;
+            }
+        }
+
+        if (wheelsOff === 4) {
+            this.gameOver = true;
+        }
+    }
+
+    restart() {
+        this.track = new Track();
+        this.car = new Car(this.track.points[0].x, this.track.points[0].y);
+        this.gameOver = false;
+        this.raceStarted = false;
+        this.currentCheckpoint = 0;
+        this.lapStartTime = 0;
+        this.lastTime = performance.now();
+    }
+}

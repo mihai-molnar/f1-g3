@@ -7,12 +7,12 @@ export class Track {
 
     generate() {
         this.points = [];
-        const numPoints = 15;
-        const margin = 200;
-        const width = 2000;
-        const height = 2000;
+        const numPoints = 20;
+        const margin = 400; // Keep away from edges
+        const width = 3000; // Virtual world size
+        const height = 3000;
 
-        // Generate random points
+        // Generate random points scattered widely
         const randomPoints = [];
         for (let i = 0; i < numPoints; i++) {
             randomPoints.push({
@@ -21,14 +21,69 @@ export class Track {
             });
         }
 
-        // Compute Convex Hull to ensure loop
-        this.points = this.convexHull(randomPoints);
+        // 1. Start with Convex Hull (Guaranteed loop)
+        let hull = this.convexHull(randomPoints);
 
-        // Add some noise/push points out to make it more interesting? 
-        // For now, convex hull gives a safe base.
+        // 2. Perturb the hull to create concavities and complexity
+        // We do this by subdividing edges and displacing the midpoints
+        let complexShape = this.perturb(hull);
 
-        // Smooth the track using Catmull-Rom splines (simplified by just adding more points)
-        this.points = this.smoothTrack(this.points);
+        // 3. Smooth the track
+        // Run smoothing more times for a fluid driving line
+        this.points = this.smoothTrack(complexShape, 5);
+    }
+
+    perturb(points) {
+        const newPoints = [];
+        const center = this.getCentroid(points);
+
+        for (let i = 0; i < points.length; i++) {
+            const p1 = points[i];
+            const p2 = points[(i + 1) % points.length];
+
+            newPoints.push(p1);
+
+            // Calculate edge properties
+            const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+
+            // Only perturb if segment is long enough
+            if (dist > 300) {
+                const midX = (p1.x + p2.x) / 2;
+                const midY = (p1.y + p2.y) / 2;
+
+                // Vector from center to midpoint
+                const toCenterX = center.x - midX;
+                const toCenterY = center.y - midY;
+                const lenToCenter = Math.hypot(toCenterX, toCenterY);
+
+                // Normalize
+                const normX = toCenterX / lenToCenter;
+                const normY = toCenterY / lenToCenter;
+
+                // Displace!
+                // Randomly push INWARD (towards center) or OUTWARD
+                // Bias towards inward to create "bends" in the oval
+                const pushInward = Math.random() > 0.3;
+                const magnitude = (Math.random() * 0.6 + 0.2) * dist * 0.5; // Proportional to edge length
+
+                const dir = pushInward ? 1 : -0.5; // Push in or slightly out
+
+                newPoints.push({
+                    x: midX + normX * magnitude * dir,
+                    y: midY + normY * magnitude * dir
+                });
+            }
+        }
+        return newPoints;
+    }
+
+    getCentroid(points) {
+        let x = 0, y = 0;
+        for (let p of points) {
+            x += p.x;
+            y += p.y;
+        }
+        return { x: x / points.length, y: y / points.length };
     }
 
     convexHull(points) {
@@ -57,32 +112,29 @@ export class Track {
         return lower.concat(upper);
     }
 
-    smoothTrack(points) {
-        // Simple subdivision smoothing
-        let smoothed = [];
-        for (let i = 0; i < points.length; i++) {
-            const p1 = points[i];
-            const p2 = points[(i + 1) % points.length];
+    smoothTrack(points, iterations = 3) {
+        let smoothed = points;
 
-            smoothed.push(p1);
-            smoothed.push({
-                x: (p1.x + p2.x) / 2,
-                y: (p1.y + p2.y) / 2
-            });
-        }
-
-        // Run a few times
-        for (let k = 0; k < 3; k++) {
+        for (let k = 0; k < iterations; k++) {
             const nextSmoothed = [];
             for (let i = 0; i < smoothed.length; i++) {
                 const p0 = smoothed[(i - 1 + smoothed.length) % smoothed.length];
                 const p1 = smoothed[i];
                 const p2 = smoothed[(i + 1) % smoothed.length];
 
+                // Catmull-Rom-ish smoothing (averaging neighbors)
                 nextSmoothed.push({
                     x: p1.x * 0.5 + p0.x * 0.25 + p2.x * 0.25,
                     y: p1.y * 0.5 + p0.y * 0.25 + p2.y * 0.25
                 });
+
+                // Subdivision: Add midpoint for higher resolution
+                if (k < 2) { // Only subdivide in early passes to avoid too many points
+                    nextSmoothed.push({
+                        x: (p1.x + p2.x) / 2,
+                        y: (p1.y + p2.y) / 2
+                    });
+                }
             }
             smoothed = nextSmoothed;
         }

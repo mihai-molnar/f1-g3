@@ -23,7 +23,10 @@ export class Game {
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'r' || e.key === 'R') {
-                if (this.gameOver) this.restart();
+                if (this.gameOver) this.restart(false);
+            }
+            if (e.key === 'n' || e.key === 'N') {
+                if (this.gameOver) this.restart(true);
             }
         });
 
@@ -70,7 +73,10 @@ export class Game {
             this.ctx.fillStyle = "white";
             this.ctx.font = "48px sans-serif";
             this.ctx.textAlign = "center";
-            this.ctx.fillText("DNF! Press R to Restart", this.width / 2, this.height / 2);
+            this.ctx.fillText("DNF!", this.width / 2, this.height / 2 - 40);
+            this.ctx.font = "24px sans-serif";
+            this.ctx.fillText("Press R to Retry (Same Track)", this.width / 2, this.height / 2 + 20);
+            this.ctx.fillText("Press N for New Track", this.width / 2, this.height / 2 + 60);
         }
 
         requestAnimationFrame(this.loop);
@@ -143,8 +149,13 @@ export class Game {
         }
     }
 
-    restart() {
-        this.track = new Track();
+    restart(newTrack = false) {
+        if (newTrack) {
+            this.track = new Track();
+            this.bestLapTime = 0; // Reset best lap on new track
+        }
+        // If not new track, keep existing this.track
+
         this.car = new Car(this.track.points[0].x, this.track.points[0].y);
         this.gameOver = false;
         this.raceStarted = false;

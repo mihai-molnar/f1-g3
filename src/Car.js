@@ -6,7 +6,7 @@ export class Car {
         this.y = y;
         this.angle = 0;
         this.speed = 0;
-        this.maxSpeed = 9; // Reduced by 25%
+        this.maxSpeed = 8; // Reduced by ~10%
         this.acceleration = 0.2;
         this.friction = 0.05;
         this.turnSpeed = 0.06;

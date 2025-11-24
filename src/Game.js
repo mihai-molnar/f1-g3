@@ -104,13 +104,13 @@ export class Game {
             this.pauseStartTime = performance.now();
 
             // Update pause menu stats
-            let current = "0.00";
+            let current = "0.000";
             if (this.raceStarted) {
-                current = ((performance.now() - this.lapStartTime) / 1000).toFixed(2);
+                current = ((performance.now() - this.lapStartTime) / 1000).toFixed(3);
             }
             document.getElementById('pause-current').textContent = current;
-            document.getElementById('pause-last').textContent = this.lastLapTime.toFixed(2);
-            document.getElementById('pause-best').textContent = this.bestLapTime.toFixed(2);
+            document.getElementById('pause-last').textContent = this.lastLapTime.toFixed(3);
+            document.getElementById('pause-best').textContent = this.bestLapTime.toFixed(3);
         } else {
             pauseMenu.classList.add('hidden');
             // Adjust lap start time by adding the duration we were paused
@@ -177,17 +177,17 @@ export class Game {
         document.getElementById('speed-value').textContent = displaySpeed.toFixed(0);
 
         // Time
-        let currentLapTime = "0.00";
+        let currentLapTime = "0.000";
         if (this.raceStarted) {
-            currentLapTime = ((performance.now() - this.lapStartTime) / 1000).toFixed(2);
+            currentLapTime = ((performance.now() - this.lapStartTime) / 1000).toFixed(3);
         }
         document.getElementById('current-time').textContent = currentLapTime;
 
         if (this.lastLapTime > 0) {
-            document.getElementById('last-time').textContent = this.lastLapTime.toFixed(2);
+            document.getElementById('last-time').textContent = this.lastLapTime.toFixed(3);
         }
         if (this.bestLapTime > 0) {
-            document.getElementById('best-time').textContent = this.bestLapTime.toFixed(2);
+            document.getElementById('best-time').textContent = this.bestLapTime.toFixed(3);
         }
 
         // Game Over Screen
@@ -220,8 +220,8 @@ export class Game {
             this.track = new Track();
             this.bestLapTime = 0;
             this.lastLapTime = 0;
-            document.getElementById('best-time').textContent = "0.00";
-            document.getElementById('last-time').textContent = "0.00";
+            document.getElementById('best-time').textContent = "0.000";
+            document.getElementById('last-time').textContent = "0.000";
         }
         // If not new track, keep existing this.track
 

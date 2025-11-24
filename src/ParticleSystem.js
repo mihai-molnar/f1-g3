@@ -18,7 +18,7 @@ export class ParticleSystem {
             const p = this.particles[i];
             p.x += p.vx;
             p.y += p.vy;
-            p.life -= 0.05;
+            p.life -= 0.02;
             if (p.life <= 0) {
                 this.particles.splice(i, 1);
             }

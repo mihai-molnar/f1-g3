@@ -20,6 +20,7 @@ export class Game {
 
         this.lastTime = 0;
         this.gameOver = false;
+        this.paused = false;
         this.shake = 0;
 
         window.addEventListener('keydown', (e) => {
@@ -28,6 +29,15 @@ export class Game {
             }
             if (e.key === 'n' || e.key === 'N') {
                 if (this.gameOver) this.restart(true);
+                if (this.paused) {
+                    this.togglePause();
+                    this.restart(true);
+                }
+            }
+            if (e.key === 'Escape') {
+                if (!this.gameOver) {
+                    this.togglePause();
+                }
             }
         });
 
@@ -55,6 +65,10 @@ export class Game {
         for (let p of corners) {
             if (!this.track.isPointOnTrack(p.x, p.y)) {
                 wheelsOff++;
+                // Emit grass/dirt particles
+                if (Math.abs(this.car.speed) > 1) {
+                    this.car.particles.emit(p.x, p.y, "rgba(60, 40, 20, 0.8)");
+                }
             }
         }
         if (wheelsOff > 0) {
@@ -81,14 +95,44 @@ export class Game {
         this.ctx.restore();
     }
 
+    togglePause() {
+        this.paused = !this.paused;
+        const pauseMenu = document.getElementById('pause-menu');
+
+        if (this.paused) {
+            pauseMenu.classList.remove('hidden');
+            this.pauseStartTime = performance.now();
+
+            // Update pause menu stats
+            let current = "0.00";
+            if (this.raceStarted) {
+                current = ((performance.now() - this.lapStartTime) / 1000).toFixed(2);
+            }
+            document.getElementById('pause-current').textContent = current;
+            document.getElementById('pause-last').textContent = this.lastLapTime.toFixed(2);
+            document.getElementById('pause-best').textContent = this.bestLapTime.toFixed(2);
+        } else {
+            pauseMenu.classList.add('hidden');
+            // Adjust lap start time by adding the duration we were paused
+            const pauseDuration = performance.now() - this.pauseStartTime;
+            if (this.raceStarted) {
+                this.lapStartTime += pauseDuration;
+            }
+            this.lastTime = performance.now();
+        }
+    }
+
     loop(timestamp) {
+        if (this.paused) {
+            requestAnimationFrame(this.loop);
+            return;
+        }
+
         const deltaTime = timestamp - this.lastTime;
         this.lastTime = timestamp;
 
         this.update(deltaTime);
         this.checkTrackLimits();
-        this.checkCheckpoints();
-        this.draw();
         this.checkCheckpoints();
         this.draw();
         this.updateHUD();

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/f1-g3/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>f1-antigravity</title>
+  <script type="module" crossorigin src="/f1-g3/assets/index-zMIHIhOF.js"></script>
+  <link rel="stylesheet" crossorigin href="/f1-g3/assets/index-Bjomg-pJ.css">
+</head>
+
+<body>
+  <div id="app"></div>
+  <div id="hud">
+    <div id="speed-box">
+      <span class="label">SPEED</span>
+      <span id="speed-value">0</span>
+      <span class="unit">KM/H</span>
+    </div>
+    <div id="time-box">
+      <div class="time-row">
+        <span class="label">CURRENT</span>
+        <span id="current-time">0.00</span>
+      </div>
+      <div class="time-row">
+        <span class="label">LAST</span>
+        <span id="last-time">0.00</span>
+      </div>
+      <div class="time-row">
+        <span class="label">BEST</span>
+        <span id="best-time">0.00</span>
+      </div>
+    </div>
+    <div id="game-over" class="hidden">
+      <h1>DNF</h1>
+      <p>TRACK LIMITS EXCEEDED</p>
+      <div class="controls">
+        <div class="key-hint"><span class="key">R</span> RETRY</div>
+        <div class="key-hint"><span class="key">N</span> NEW TRACK</div>
+      </div>
+    </div>
+    <div id="pause-menu" class="hidden">
+      <h1>PAUSED</h1>
+      <div class="stats">
+        <div class="stat-row">
+          <span class="label">CURRENT LAP</span>
+          <span id="pause-current">0.00</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">LAST LAP</span>
+          <span id="pause-last">0.00</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">BEST LAP</span>
+          <span id="pause-best">0.00</span>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="key-hint"><span class="key">ESC</span> CONTINUE</div>
+        <div class="key-hint"><span class="key">N</span> NEW TRACK</div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

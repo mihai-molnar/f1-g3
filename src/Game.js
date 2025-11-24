@@ -8,7 +8,15 @@ export class Game {
         this.width = canvas.width;
         this.height = canvas.height;
 
-        this.track = new Track();
+        // Get seed from URL hash or generate new one
+        let seed = parseInt(window.location.hash.substring(1));
+        if (isNaN(seed)) {
+            seed = Date.now();
+            window.location.hash = seed;
+        }
+        this.currentSeed = seed;
+
+        this.track = new Track(this.currentSeed);
         // Start car at the first track point
         this.car = new Car(this.track.points[0].x, this.track.points[0].y);
 
@@ -217,13 +225,17 @@ export class Game {
 
     restart(newTrack = false) {
         if (newTrack) {
-            this.track = new Track();
+            // Generate new seed
+            this.currentSeed = Date.now();
+            window.location.hash = this.currentSeed;
+
+            this.track = new Track(this.currentSeed);
             this.bestLapTime = 0;
             this.lastLapTime = 0;
             document.getElementById('best-time').textContent = "0.000";
             document.getElementById('last-time').textContent = "0.000";
         }
-        // If not new track, keep existing this.track
+        // If not new track, keep existing this.track (and thus same seed)
 
         this.car = new Car(this.track.points[0].x, this.track.points[0].y);
         this.gameOver = false;

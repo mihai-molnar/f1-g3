@@ -1,7 +1,11 @@
+import { Random } from './utils/Random.js';
+
 export class Track {
-    constructor() {
+    constructor(seed) {
         this.points = [];
         this.width = 100;
+        this.seed = seed || Date.now();
+        this.rng = new Random(this.seed);
         this.generate();
     }
 
@@ -16,8 +20,8 @@ export class Track {
         const randomPoints = [];
         for (let i = 0; i < numPoints; i++) {
             randomPoints.push({
-                x: Math.random() * (width - margin * 2) + margin,
-                y: Math.random() * (height - margin * 2) + margin
+                x: this.rng.next() * (width - margin * 2) + margin,
+                y: this.rng.next() * (height - margin * 2) + margin
             });
         }
 
@@ -63,8 +67,8 @@ export class Track {
                 // Displace!
                 // Randomly push INWARD (towards center) or OUTWARD
                 // Bias towards inward to create "bends" in the oval
-                const pushInward = Math.random() > 0.3;
-                const magnitude = (Math.random() * 0.6 + 0.2) * dist * 0.5; // Proportional to edge length
+                const pushInward = this.rng.next() > 0.3;
+                const magnitude = (this.rng.next() * 0.6 + 0.2) * dist * 0.5; // Proportional to edge length
 
                 const dir = pushInward ? 1 : -0.5; // Push in or slightly out
 

@@ -95,109 +95,162 @@ export class Car {
         // Shadows
         ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
         ctx.beginPath();
-        ctx.ellipse(0, 0, 12, 25, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, 13, 28, 0, 0, Math.PI * 2);
         ctx.fill();
 
         // Suspension Arms
         ctx.strokeStyle = "#111";
         ctx.lineWidth = 2;
         // Front
-        ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(-11, -18); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(11, -18); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(-12, -20); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(12, -20); ctx.stroke();
         // Rear
-        ctx.beginPath(); ctx.moveTo(0, 5); ctx.lineTo(-11, 8); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, 5); ctx.lineTo(11, 8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, 8); ctx.lineTo(-12, 12); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, 8); ctx.lineTo(12, 12); ctx.stroke();
 
-        // Main Body (Chassis)
-        const gradient = ctx.createLinearGradient(-10, 0, 10, 0);
-        gradient.addColorStop(0, "#B71C1C");
-        gradient.addColorStop(0.5, "#D32F2F");
-        gradient.addColorStop(1, "#B71C1C");
+        // --- Main Body (Chassis) ---
+        // Modern F1 shape: Narrow nose, wide sidepods, tight rear (coke bottle)
+
+        // 1. Floor / Undertray (Black carbon fiber look)
+        ctx.fillStyle = "#1a1a1a";
+        ctx.beginPath();
+        ctx.moveTo(-9, -8);
+        ctx.lineTo(9, -8);
+        ctx.lineTo(9, 18);
+        ctx.lineTo(-9, 18);
+        ctx.fill();
+
+        // 2. Main Body Gradient (Red/White Livery)
+        const gradient = ctx.createLinearGradient(-6, 0, 6, 0);
+        gradient.addColorStop(0, "#D32F2F");   // Red Side
+        gradient.addColorStop(0.3, "#D32F2F");
+        gradient.addColorStop(0.35, "#FFFFFF"); // White Stripe
+        gradient.addColorStop(0.65, "#FFFFFF");
+        gradient.addColorStop(0.7, "#D32F2F");  // Red Side
+        gradient.addColorStop(1, "#D32F2F");
         ctx.fillStyle = gradient;
 
         ctx.beginPath();
-        ctx.moveTo(-4, -20); // Nose tip
-        ctx.lineTo(4, -20);
-        ctx.lineTo(6, -5); // Cockpit start
-        ctx.lineTo(8, 5); // Sidepods start
-        ctx.lineTo(8, 15); // Rear
-        ctx.lineTo(-8, 15);
-        ctx.lineTo(-8, 5);
-        ctx.lineTo(-6, -5);
+        ctx.moveTo(0, -24); // Nose tip (longer)
+        ctx.lineTo(3, -15);
+        ctx.lineTo(4, -5);  // Cockpit start
+        ctx.lineTo(9, 0);   // Sidepod flare
+        ctx.lineTo(9, 12);  // Sidepod end
+        ctx.lineTo(5, 18);  // Rear tight
+        ctx.lineTo(-5, 18);
+        ctx.lineTo(-9, 12);
+        ctx.lineTo(-9, 0);
+        ctx.lineTo(-4, -5);
+        ctx.lineTo(-3, -15);
         ctx.closePath();
         ctx.fill();
 
-        // Sidepods (Air intakes)
-        ctx.fillStyle = "#8E0000";
+        // 3. Sidepods (Air Intakes) - Darker Red for depth
+        ctx.fillStyle = "#B71C1C";
         ctx.beginPath();
-        ctx.moveTo(-8, 0);
-        ctx.lineTo(-6, 0);
-        ctx.lineTo(-6, 10);
-        ctx.lineTo(-8, 10);
+        ctx.moveTo(-9, 2);
+        ctx.lineTo(-5, 2);
+        ctx.lineTo(-5, 10);
+        ctx.lineTo(-8, 8);
         ctx.fill();
         ctx.beginPath();
-        ctx.moveTo(8, 0);
-        ctx.lineTo(6, 0);
-        ctx.lineTo(6, 10);
-        ctx.lineTo(8, 10);
+        ctx.moveTo(9, 2);
+        ctx.lineTo(5, 2);
+        ctx.lineTo(5, 10);
+        ctx.lineTo(8, 8);
         ctx.fill();
 
-        // Cockpit / Driver
+        // --- Cockpit Area ---
+        // Driver
         ctx.fillStyle = "#111";
         ctx.beginPath();
-        ctx.ellipse(0, -2, 3, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, -2, 3.5, 6, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Helmet
-        ctx.fillStyle = "#FFEB3B";
+        // Helmet (White/Red design)
+        ctx.fillStyle = "#FFFFFF";
         ctx.beginPath();
-        ctx.arc(0, -2, 2.5, 0, Math.PI * 2);
+        ctx.arc(0, -2, 2.8, 0, Math.PI * 2);
         ctx.fill();
-        // Visor
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 1;
+        // Helmet Stripe
+        ctx.fillStyle = "#D32F2F";
         ctx.beginPath();
-        ctx.moveTo(-1.5, -3);
-        ctx.lineTo(1.5, -3);
+        ctx.arc(0, -2, 2.8, -Math.PI / 4, Math.PI / 4);
+        ctx.fill();
+
+        // Halo (Safety Device)
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, -2, 5, Math.PI, 0); // Arc around driver
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, -7); // Center pillar
+        ctx.lineTo(0, -4);
         ctx.stroke();
 
-        // Front Wing
-        ctx.fillStyle = "#212121";
+        // --- Wings ---
+        // Front Wing (Swept back, complex)
+        ctx.fillStyle = "#212121"; // Dark Carbon
         ctx.beginPath();
-        ctx.roundRect(-12, -24, 24, 4, 2);
+        ctx.moveTo(0, -24);
+        ctx.lineTo(14, -20);
+        ctx.lineTo(14, -16);
+        ctx.lineTo(2, -21);
+        ctx.lineTo(-2, -21);
+        ctx.lineTo(-14, -16);
+        ctx.lineTo(-14, -20);
+        ctx.closePath();
         ctx.fill();
-        // Wing Flaps
-        ctx.fillStyle = "#424242";
-        ctx.fillRect(-12, -23, 8, 2);
-        ctx.fillRect(4, -23, 8, 2);
 
-        // Rear Wing
-        ctx.fillStyle = "#212121";
+        // Front Wing Flaps (Red tips)
+        ctx.fillStyle = "#D32F2F";
+        ctx.fillRect(-14, -19, 6, 2);
+        ctx.fillRect(8, -19, 6, 2);
+
+        // Rear Wing (Wider, lower)
+        ctx.fillStyle = "#111";
         ctx.beginPath();
-        ctx.roundRect(-11, 14, 22, 5, 1);
+        ctx.roundRect(-12, 16, 24, 6, 1);
         ctx.fill();
-        // DRS Flap
-        ctx.fillStyle = "#424242";
-        ctx.fillRect(-10, 15, 20, 2);
+
+        // Rear Wing Endplates (Red)
+        ctx.fillStyle = "#D32F2F";
+        ctx.fillRect(-12, 16, 2, 6);
+        ctx.fillRect(10, 16, 2, 6);
+
+        // DRS Flap (White)
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(-10, 17, 20, 2);
 
         // Wheels with tire tread detail
         ctx.fillStyle = "#1a1a1a";
         const drawWheel = (x, y) => {
             ctx.save();
             ctx.translate(x, y);
+
+            // Tire
+            ctx.fillStyle = "#1a1a1a";
             ctx.beginPath();
-            ctx.roundRect(-3, -5, 6, 10, 2);
+            ctx.roundRect(-4, -6, 8, 12, 2);
             ctx.fill();
-            // Rim
-            ctx.fillStyle = "#333";
-            ctx.fillRect(-1, -2, 2, 4);
+
+            // Subtle highlight for roundness
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.fillRect(-2, -6, 2, 12);
+
+            // Yellow soft compound stripe (visible on edge)
+            ctx.fillStyle = "#FFEB3B";
+            ctx.fillRect(-4, -2, 1, 4);
+            ctx.fillRect(3, -2, 1, 4);
+
             ctx.restore();
         };
 
-        drawWheel(-14, -18); // FL
-        drawWheel(14, -18);  // FR
-        drawWheel(-14, 11);  // RL
-        drawWheel(14, 11);   // RR
+        drawWheel(-15, -20); // FL
+        drawWheel(15, -20);  // FR
+        drawWheel(-15, 12);  // RL
+        drawWheel(15, 12);   // RR
 
         ctx.restore();
     }

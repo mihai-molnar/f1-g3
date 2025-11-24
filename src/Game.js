@@ -174,7 +174,10 @@ export class Game {
     restart(newTrack = false) {
         if (newTrack) {
             this.track = new Track();
-            this.bestLapTime = 0; // Reset best lap on new track
+            this.bestLapTime = 0;
+            this.lastLapTime = 0;
+            document.getElementById('best-time').textContent = "0.00";
+            document.getElementById('last-time').textContent = "0.00";
         }
         // If not new track, keep existing this.track
 
